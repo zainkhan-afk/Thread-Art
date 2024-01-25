@@ -8,8 +8,11 @@ from PIL import Image
 
 thread_art_solver = Solver()
 
+
+img_array = None
+
 def GenerateClicked():
-	print("Pressed Generate")
+	GenerateArt()
 
 
 with st.sidebar:
@@ -35,7 +38,7 @@ with st.sidebar:
     "Image Type",
     ["Square", "Round"])
 
-	st.button("Generate Thread Art", key=None,  on_click=GenerateClicked, use_container_width = True)
+	st.button("Generate Thread Art", key = None,  on_click = GenerateClicked, use_container_width = True)
 
 
 
@@ -45,10 +48,8 @@ with st.sidebar:
 my_placeholder = st.empty()
 
 
-
-while True:
-	img = np.zeros((500, 500, 3)).astype("uint8")
-	for i in range(3):
-		img[:, :, i] = random.randint(0, 255)
-	my_placeholder.image(img, use_column_width=True)
-	time.sleep(0.5)
+def GenerateArt():
+	global img_array, thread_art_solver
+	if img_array is not None:
+		img = thread_art_solver.CreateThreadArt(img_array)
+		my_placeholder.image(img, use_column_width=True)

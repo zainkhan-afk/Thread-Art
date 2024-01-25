@@ -51,8 +51,9 @@ class Solver:
 
 		return img
 
-	def CreateThreadArt(self, path):
-		img = self.LoadImage(path)
+	def CreateThreadArt(self, img):
+		img = self.LoadImage(img)
+		return (np.ones(img.shape)*255).astype("uint8")
 
 
 if __name__ == "__main__":
