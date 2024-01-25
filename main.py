@@ -11,4 +11,4 @@ while True:
 	for i in range(3):
 		img[:, :, i] = random.randint(0, 255)
 	my_placeholder.image(img, use_column_width=True)
-	time.sleep(0.1)
+	time.sleep(0.5)
