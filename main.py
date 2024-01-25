@@ -31,6 +31,10 @@ with st.sidebar:
 		)
 
 
+	image_type = st.radio(
+    "Image Type",
+    ["Square", "Round"])
+
 	st.button("Generate Thread Art", key=None,  on_click=GenerateClicked, use_container_width = True)
 
 
