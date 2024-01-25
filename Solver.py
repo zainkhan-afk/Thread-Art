@@ -42,8 +42,10 @@ class Solver:
 	def Resize(self, img):
 		return cv2.resize(img, self.img_size)
 
-	def LoadImage(self, path):
-		img = cv2.imread(path, 0)
+	def LoadImage(self, img):
+		# img = cv2.imread(path, 0)
+		if len(img.shape) > 2:
+			img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) 
 		img = self.SquarePad(img)
 		img = self.Resize(img)
 

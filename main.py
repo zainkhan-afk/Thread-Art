@@ -17,14 +17,20 @@ with st.sidebar:
 	if uploaded_img is not None:
 		image = Image.open(uploaded_img)
 		img_array = np.array(image)
+		img_array = thread_art_solver.LoadImage(img_array)
 
 
 		st.image(
-	        img_array,
-	        caption=f"You amazing image has shape {img_array.shape[0:2]}",
-	        use_column_width=True,
-    	)
-    	
+			img_array,
+			use_column_width=True,
+		)
+	else:
+		st.image(
+			np.zeros((100, 100)).astype("uint8"),
+			use_column_width=True,
+		)
+
+
 	st.button("Generate Thread Art", key=None,  on_click=GenerateClicked, use_container_width = True)
 
 
