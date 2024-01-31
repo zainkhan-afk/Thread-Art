@@ -64,6 +64,7 @@ class ThreadArtMaker:
 		self.frames_list = []
 		self.frame_number = 0
 		self.frames_exhausted = False
+		self.solver.halt = False
 
 		self.input_image = img
 		
@@ -88,6 +89,10 @@ class ThreadArtMaker:
 
 
 		return img
+
+
+	def Stop(self):
+		self.solver.halt = True
 
 
 if __name__ == "__main__":

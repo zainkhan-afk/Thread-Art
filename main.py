@@ -29,6 +29,7 @@ def GenerateArtClicked():
 
 def StopArtClicked():
 	st.session_state['art_started'] = False
+	thread_art_maker.Stop()
 
 def DrawSideBar():
 	with st.sidebar:

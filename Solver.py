@@ -12,6 +12,7 @@ class Solver:
 		self.nails_per_side = self.num_nails // 4
 		self.dist_between_nails = self.img_size[0] / self.nails_per_side
 		self.solved = False
+		self.halt = False
 
 		'''
 		0                  		
@@ -75,12 +76,9 @@ class Solver:
 
 			X2, Y2 = self.GetNailPos(chosen_nail)
 			
-			line_image = 255*np.ones(img_out.shape).astype("uint8")
+
 			temp = img_out.copy()
 			temp = cv2.line(temp, (X1, Y1), (X2, Y2), 0, 1)
-			# line_image = cv2.blur(line_image, (3, 3))  
-
-			# temp = img_out.copy() + line_image
 
 			MSE = self.GetImgMSE(in_img, temp)
 
@@ -97,7 +95,7 @@ class Solver:
 		thread_trail = [random.randint(0, self.num_nails - 1)]
 		out_image = 255 * np.ones(img.shape).astype("uint8")
 		frames_list.append(out_image.copy())
-		while True:
+		while not self.halt:
 			print(f"Lines Completed: {len(thread_trail)}")
 			current_nail = thread_trail[-1]
 			out_image, chosen_nail = self.GetOptimalLine(current_nail, img, out_image)
@@ -107,9 +105,10 @@ class Solver:
 
 
 			if len(thread_trail) > 500:
-				break
+				self.halt = True
 
 		self.solved = True
+
 
 
 
