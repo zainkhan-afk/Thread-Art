@@ -11,6 +11,8 @@ class ThreadArtMaker:
 		self.input_image = None
 		self.out_image = None
 		self.solver = Solver(num_nails = 360, img_size = (800, 800))
+		self.frame_number = 0
+		self.frames_exhausted = False
 	
 	def SquareCrop(self, img):
 		H, W = img.shape
@@ -58,13 +60,25 @@ class ThreadArtMaker:
 		return img
 
 	def Solve(self, img, mode):
+		self.frame_number = 0
+		self.frames_exhausted = False
+
 		self.input_image = img
-		self.solver.Solve(img, mode)
+		self.out_image, self.frames_list = self.solver.Solve(img, mode)
 
 		self.num_imgs_converted += 1
 
 	def GetFrame(self):
-		return (np.ones(self.input_image.shape)*255).astype("uint8")
+		if not self.frames_exhausted:
+			img = self.frames_list[self.frame_number]
+			self.frame_number += 1
+		else:
+			img = self.out_image.copy()
+
+		if self.frame_number >= len(self.frames_list):
+			self.frames_exhausted = True
+
+		return img
 
 
 if __name__ == "__main__":

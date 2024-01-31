@@ -71,18 +71,20 @@ class Solver:
 	
 	def Solve(self, img, mode):
 		self.thread_trail.append(random.randint(0, self.num_nails - 1))
-		self.out_image = 255 * np.ones(img.shape).astype("uint8")
-
+		out_image = 255 * np.ones(img.shape).astype("uint8")
+		frames_list = [out_image.copy()]
 		while True:
 			current_nail = self.thread_trail[-1]
-			self.out_image, chosen_nail = self.GetOptimalLine(current_nail, img, self.out_image)
+			out_image, chosen_nail = self.GetOptimalLine(current_nail, img, out_image)
 
 			self.thread_trail.append(chosen_nail)
+			frames_list.append(out_image.copy())
 
-			if len(self.thread_trail) > 10:
+
+			if len(self.thread_trail) > 100:
 				break
 
-		return self.out_image
+		return out_image, frames_list
 
 
 
@@ -91,6 +93,9 @@ class Solver:
 if __name__ == "__main__":
 	dum_img = np.zeros((800, 800)).astype("uint8")
 	solver = Solver(num_nails = 360, img_size = (800, 800))
-	out = solver.Solve(dum_img, "Square")
-	cv2.imshow("out", out)
-	cv2.waitKey()
+	out, frames_list = solver.Solve(dum_img, "Square")
+
+	for frame in frames_list:
+		cv2.imshow("out", out)
+		cv2.imshow("frame", frame)
+		cv2.waitKey(30)
