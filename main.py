@@ -12,11 +12,17 @@ if 'art_started' not in st.session_state:
 if 'thread_art_solver' not in st.session_state:
 	st.session_state['thread_art_solver'] = Solver()
 
+if 'input_image' not in st.session_state:
+	st.session_state['input_image'] = None
+
 thread_art_solver = st.session_state['thread_art_solver']
 
 def GenerateArtClicked():
 	st.session_state['art_started'] = True
-	# GenerateArt()
+
+	if st.session_state['input_image'] is not None:
+		thread_art_solver.Solve(st.session_state['input_image'])
+				
 
 def StopArtClicked():
 	st.session_state['art_started'] = False
@@ -55,7 +61,9 @@ def DrawSideBar():
 
 def DrawDisplayImage():
 	my_placeholder = st.empty()
-
+	if st.session_state['art_started']:
+		img = thread_art_solver.GetFrame()
+		my_placeholder.image(img, use_column_width=True)
 
 
 # def GenerateArt():

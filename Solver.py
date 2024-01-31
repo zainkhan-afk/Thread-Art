@@ -6,6 +6,7 @@ class Solver:
 		self.img_size = img_size
 		self.num_nails = num_nails
 		self.num_imgs_converted = 0
+		self.input_image = None
 	
 	def SquareCrop(self, img):
 		H, W = img.shape
@@ -52,10 +53,12 @@ class Solver:
 
 		return img
 
-	def CreateThreadArt(self, img):
-		img = self.LoadImage(img)
+	def Solve(self, img):
+		self.input_image = img
 		self.num_imgs_converted += 1
-		return (np.ones(img.shape)*255).astype("uint8")
+
+	def GetFrame(self):
+		return (np.ones(self.input_image.shape)*255).astype("uint8")
 
 
 if __name__ == "__main__":
