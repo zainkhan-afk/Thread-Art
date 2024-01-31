@@ -5,6 +5,7 @@ class Solver:
 	def __init__(self, num_nails = 360, img_size = (800, 800)):
 		self.img_size = img_size
 		self.num_nails = num_nails
+		self.num_imgs_converted = 0
 	
 	def SquareCrop(self, img):
 		H, W = img.shape
@@ -53,6 +54,7 @@ class Solver:
 
 	def CreateThreadArt(self, img):
 		img = self.LoadImage(img)
+		self.num_imgs_converted += 1
 		return (np.ones(img.shape)*255).astype("uint8")
 
 
