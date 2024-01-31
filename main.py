@@ -70,9 +70,10 @@ def DrawDisplayImage():
 		while not thread_art_maker.frames_exhausted:
 			img = thread_art_maker.GetFrame()
 			my_placeholder.image(img, use_column_width=True)
-			time.sleep(0.3)
+			time.sleep(0.5)
 
 		my_placeholder.image(thread_art_maker.out_image, use_column_width=True)
+		st.session_state['art_started'] = False
 
 
 
