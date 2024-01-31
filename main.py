@@ -3,25 +3,28 @@ import streamlit as st
 import time
 import random
 import numpy as np
-from Solver import Solver
+from ThreadArtMaker import ThreadArtMaker
 from PIL import Image
 
 if 'art_started' not in st.session_state:
 	st.session_state['art_started'] = False
 
-if 'thread_art_solver' not in st.session_state:
-	st.session_state['thread_art_solver'] = Solver()
+if 'out_type' not in st.session_state:
+	st.session_state['out_type'] = None
+
+if 'thread_art_maker' not in st.session_state:
+	st.session_state['thread_art_maker'] = ThreadArtMaker()
 
 if 'input_image' not in st.session_state:
 	st.session_state['input_image'] = None
 
-thread_art_solver = st.session_state['thread_art_solver']
+thread_art_maker = st.session_state['thread_art_maker']
 
 def GenerateArtClicked():
 	st.session_state['art_started'] = True
 
 	if st.session_state['input_image'] is not None:
-		thread_art_solver.Solve(st.session_state['input_image'])
+		thread_art_maker.Solve(st.session_state['input_image'], st.session_state['out_type'])
 				
 
 def StopArtClicked():
@@ -33,7 +36,7 @@ def DrawSideBar():
 		if uploaded_img is not None:
 			image = Image.open(uploaded_img)
 			image = np.array(image)
-			st.session_state['input_image'] = thread_art_solver.LoadImage(image)
+			st.session_state['input_image'] = thread_art_maker.LoadImage(image)
 
 
 			st.image(
@@ -51,8 +54,10 @@ def DrawSideBar():
 
 
 		image_type = st.radio(
-	    "Image Type",
-	    ["Square", "Round"])
+		"Image Type",
+		["Square", "Round"])
+
+		st.session_state['out_type'] = image_type
 
 		if not st.session_state['art_started']:
 			st.button("Generate Thread Art", on_click = GenerateArtClicked, use_container_width = True)
@@ -62,14 +67,14 @@ def DrawSideBar():
 def DrawDisplayImage():
 	my_placeholder = st.empty()
 	if st.session_state['art_started']:
-		img = thread_art_solver.GetFrame()
+		img = thread_art_maker.GetFrame()
 		my_placeholder.image(img, use_column_width=True)
 
 
 # def GenerateArt():
 # 	if img_array is not None:
 # 		print("img array is not None")
-# 		out_img = thread_art_solver.CreateThreadArt(img_array)
+# 		out_img = thread_art_maker.CreateThreadArt(img_array)
 # 		print(out_img)
 # 		my_placeholder.image(out_img, use_column_width=True)
 # 		print(my_placeholder)
