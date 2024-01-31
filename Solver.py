@@ -6,12 +6,12 @@ class Solver:
 	def __init__(self, num_nails = 360, img_size = (800, 800)):
 		self.img_size = img_size
 		self.num_nails = num_nails
-		self.thread_trail = []
 		self.nails_list = list(range(self.num_nails))
 
 		# Calculations for Square images
 		self.nails_per_side = self.num_nails // 4
 		self.dist_between_nails = self.img_size[0] / self.nails_per_side
+		self.solved = False
 
 		'''
 		0                  		
@@ -22,6 +22,10 @@ class Solver:
     3N/4|_______________________| N/2
 		                 
 		'''
+
+	def GetImgMSE(self, input_image, constructed_image):
+		return ((input_image - constructed_image)**2 ).sum() / (input_image.shape[0]*input_image.shape[1])
+	
 	def ValidNail(self, nail1, nail2):
 		side1 = nail1//self.nails_per_side
 		side2 = nail2//self.nails_per_side
@@ -53,38 +57,59 @@ class Solver:
 		return int(X), int(Y)
 
 
-	def GetOptimalLine(self, start_nail, in_img, temp_out):
+	def GetOptimalLine(self, start_nail, in_img, img_out):
 		X1, Y1 = self.GetNailPos(start_nail)
+		nails_explored = []
 
-		chosen_nail = None
-		while True:
-			chosen_nail = random.sample(self.nails_list, 1)[0]
-			if self.ValidNail(start_nail, chosen_nail):
-				break
+		min_error = 1000000
+		min_error_nail = None
+		min_error_image = None
 
-		X2, Y2 = self.GetNailPos(chosen_nail)
+		while len(nails_explored) < self.num_nails - 2:
+			chosen_nail = None
+			while True:
+				chosen_nail = random.sample(self.nails_list, 1)[0]
+				nails_explored.append(chosen_nail)
+				if self.ValidNail(start_nail, chosen_nail):
+					break
 
-		temp_out = cv2.line(temp_out, (X1, Y1), (X2, Y2), 0, 1)
+			X2, Y2 = self.GetNailPos(chosen_nail)
+			
+			line_image = 255*np.ones(img_out.shape).astype("uint8")
+			temp = img_out.copy()
+			temp = cv2.line(temp, (X1, Y1), (X2, Y2), 0, 1)
+			# line_image = cv2.blur(line_image, (3, 3))  
 
-		return temp_out, chosen_nail
+			# temp = img_out.copy() + line_image
+
+			MSE = self.GetImgMSE(in_img, temp)
+
+			if MSE < min_error:
+				min_error = MSE
+				min_error_nail = chosen_nail
+				min_error_image = temp.copy()
+
+		return min_error_image, min_error_nail
 
 	
-	def Solve(self, img, mode):
-		self.thread_trail.append(random.randint(0, self.num_nails - 1))
+	def Solve(self, img, mode, frames_list):
+		self.solved = False
+		thread_trail = [random.randint(0, self.num_nails - 1)]
 		out_image = 255 * np.ones(img.shape).astype("uint8")
-		frames_list = [out_image.copy()]
+		frames_list.append(out_image.copy())
 		while True:
-			current_nail = self.thread_trail[-1]
+			print(f"Lines Completed: {len(thread_trail)}")
+			current_nail = thread_trail[-1]
 			out_image, chosen_nail = self.GetOptimalLine(current_nail, img, out_image)
 
-			self.thread_trail.append(chosen_nail)
+			thread_trail.append(chosen_nail)
 			frames_list.append(out_image.copy())
 
 
-			if len(self.thread_trail) > 100:
+			if len(thread_trail) > 500:
 				break
 
-		return out_image, frames_list
+		self.solved = True
 
 
 
@@ -92,8 +117,11 @@ class Solver:
 
 if __name__ == "__main__":
 	dum_img = np.zeros((800, 800)).astype("uint8")
+	dum_img = cv2.imread("star.jpg", 0)
 	solver = Solver(num_nails = 360, img_size = (800, 800))
 	out, frames_list = solver.Solve(dum_img, "Square")
+
+	cv2.imwrite("out.jpg", out)
 
 	for frame in frames_list:
 		cv2.imshow("out", out)
